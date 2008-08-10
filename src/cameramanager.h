@@ -31,12 +31,14 @@ class CameraManager
  public:
   CameraManager();
   virtual ~CameraManager();
-  void play_cam(Gtk::DrawingArea **video_ui);
+
+  void play_cam();
   void switch_effect(const gchar *effect_name);
   void stop_cam();
 
   //  std::string *effect_name;
   const gchar *effect_name;
+  Gtk::DrawingArea **video;
 
  protected:
   GstElement *pipeline, *bin, *source, *filter, *effect, *sink;

@@ -122,7 +122,8 @@ ImotionApp::ImotionApp ()
 
     treeSel->signal_changed().connect( sigc::mem_fun(*this, &ImotionApp::on_selection_changed));
 
-    m_cameramanager.play_cam(&video);
+    m_cameramanager.video = &video;
+    m_cameramanager.play_cam();
   }
   else
     {

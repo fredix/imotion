@@ -82,10 +82,12 @@ gboolean bus_callback (GstBus *bus,
 
 CameraManager::CameraManager ()
 {
+ pipeline = bin = source = filter = effect = sink = NULL;
 }
 
+
 void
-CameraManager::play_cam (Gtk::DrawingArea **video_ui)
+CameraManager::play_cam ()
 {
   pipeline = gst_pipeline_new ("pipeline");
   bin = gst_bin_new ("bin");
@@ -99,8 +101,10 @@ CameraManager::play_cam (Gtk::DrawingArea **video_ui)
 
   filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
 
-  effect = gst_element_factory_make ("edgetv", "effect");
-
+  if ( !effect )
+    {
+      effect = gst_element_factory_make ("edgetv", "effect");
+    }
 
   sink = gst_element_factory_make ("ximagesink", "video_sink");
 
@@ -124,7 +128,7 @@ CameraManager::play_cam (Gtk::DrawingArea **video_ui)
   gst_bus_add_watch (bus, bus_callback, NULL);
 
 
-  gst_bus_set_sync_handler (bus, (GstBusSyncHandler) create_window, *video_ui);
+  gst_bus_set_sync_handler (bus, (GstBusSyncHandler) create_window, *video);
 
   //  g_signal_connect (bus, "message::error", G_CALLBACK (cb_message_error), NULL);
   //  g_signal_connect (bus, "message::eos", G_CALLBACK (cb_message_eos), NULL);
@@ -135,13 +139,25 @@ CameraManager::play_cam (Gtk::DrawingArea **video_ui)
 void
 CameraManager::stop_cam ()
 {
-  printf("stop cam\n");
+  if ( pipeline )
+    {
+      gst_element_set_state (pipeline, GST_STATE_NULL);
+      g_print ("Deleting pipeline\n");
+      gst_object_unref (GST_OBJECT (pipeline));
+      pipeline = bin = source = filter = effect = sink = NULL;
+      printf("stop cam\n");
+    }
 }
 
 
 void
 CameraManager::switch_effect (const gchar *effect_name)
 {
+  stop_cam();
+
+  effect = gst_element_factory_make (effect_name, "effect");
+  play_cam();
+
   printf("%s\n", effect_name);
 }
 
