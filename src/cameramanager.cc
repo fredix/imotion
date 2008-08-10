@@ -124,14 +124,6 @@ CameraManager::play_cam (Gtk::DrawingArea **video_ui)
   gst_bus_add_watch (bus, bus_callback, NULL);
 
 
-
-  //  XID video = gdk_x11_drawable_get_xid( pVideo->get_window()->gobj());
-
-
-
-  //  std::cout << gdk_x11_drawable_get_xid( (*pVideo)->get_window()->gobj()) << "\n";
-
-
   gst_bus_set_sync_handler (bus, (GstBusSyncHandler) create_window, *video_ui);
 
   //  g_signal_connect (bus, "message::error", G_CALLBACK (cb_message_error), NULL);
