@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# gst-launch-0.10 v4l2src device=/dev/video0 ! sdlvideosink
+
+g++ -Wall -g -o imotion imotion.cc imotionapp.cc cameramanager.cc `pkg-config --cflags --libs gtkmm-2.4 libglademm-2.4 gstreamermm-0.10`
