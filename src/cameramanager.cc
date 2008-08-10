@@ -101,10 +101,6 @@ CameraManager::play_cam ()
 
   filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
 
-  if ( !effect )
-    {
-      effect = gst_element_factory_make ("edgetv", "effect");
-    }
 
   sink = gst_element_factory_make ("ximagesink", "video_sink");
 
@@ -114,14 +110,26 @@ CameraManager::play_cam ()
     //    return EXIT_FAILURE;
   }
 
+  if ( effect )
+    {
+      /* set up pipeline */
+      gst_bin_add_many (GST_BIN (bin), source, filter, effect, sink, NULL);
+      gst_bin_add (GST_BIN (pipeline), bin);
+      //gst_element_link (source, sink);
+      gst_element_link_many (source, filter, effect, sink, NULL);
 
-  /* set up pipeline */
-  gst_bin_add_many (GST_BIN (bin), source, filter, effect, sink, NULL);
-  gst_bin_add (GST_BIN (pipeline), bin);
-  //gst_element_link (source, sink);
-  gst_element_link_many (source, filter, effect, sink, NULL);
+    }
+  else
+    {
+      /* set up pipeline */
+      gst_bin_add_many (GST_BIN (bin), source, filter, sink, NULL);
+      gst_bin_add (GST_BIN (pipeline), bin);
+      gst_element_link_many (source, filter, sink, NULL);
+    }
+
 
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
 
 
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
@@ -154,8 +162,10 @@ void
 CameraManager::switch_effect (const gchar *effect_name)
 {
   stop_cam();
-
-  effect = gst_element_factory_make (effect_name, "effect");
+  if (!g_strrstr (effect_name, "none"))
+    {
+      effect = gst_element_factory_make (effect_name, "effect");
+    }
   play_cam();
 
   printf("%s\n", effect_name);

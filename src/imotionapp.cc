@@ -63,6 +63,14 @@ ImotionApp::ImotionApp ()
       quit_button->signal_clicked().connect( sigc::mem_fun(*this, &ImotionApp::on_quit_clicked) );
     }
 
+    gui_glade_xml->get_widget ("imagemenuitem_quit", item_quit);
+    if (item_quit)
+    {
+      item_quit->signal_activate().connect( sigc::mem_fun(*this, &ImotionApp::on_quit_clicked) );
+    }
+
+
+
     gui_glade_xml->get_widget ("toolbutton_stop", stop_button);
     if(stop_button)
     {

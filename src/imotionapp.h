@@ -68,6 +68,8 @@ class ImotionApp
   Gtk::ToolButton *quit_button;
   Gtk::ToolButton *stop_button;
   Gtk::ImageMenuItem *item_about;
+  Gtk::ImageMenuItem *item_quit;
+  Gtk::ImageMenuItem *item_fullscreen;
   Gtk::AboutDialog *about_dialog;
   Glib::RefPtr<Gnome::Glade::Xml> gui_glade_xml;
 
