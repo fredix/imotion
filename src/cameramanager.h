@@ -41,7 +41,7 @@ class CameraManager
   Gtk::DrawingArea **video;
 
  protected:
-  GstElement *pipeline, *bin, *source, *filter, *effect, *sink;
+  GstElement *pipeline, *bin, *source, *filter, *videoscale, *effect, *sink;
   GstBus *bus;
 };
 

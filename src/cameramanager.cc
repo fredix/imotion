@@ -101,6 +101,8 @@ CameraManager::play_cam ()
 
   filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
 
+  videoscale = gst_element_factory_make ("videoscale", "video_scale");
+
 
   sink = gst_element_factory_make ("ximagesink", "video_sink");
 
@@ -113,18 +115,18 @@ CameraManager::play_cam ()
   if ( effect )
     {
       /* set up pipeline */
-      gst_bin_add_many (GST_BIN (bin), source, filter, effect, sink, NULL);
+      gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, effect, sink, NULL);
       gst_bin_add (GST_BIN (pipeline), bin);
       //gst_element_link (source, sink);
-      gst_element_link_many (source, filter, effect, sink, NULL);
+      gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
 
     }
   else
     {
       /* set up pipeline */
-      gst_bin_add_many (GST_BIN (bin), source, filter, sink, NULL);
+      gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, sink, NULL);
       gst_bin_add (GST_BIN (pipeline), bin);
-      gst_element_link_many (source, filter, sink, NULL);
+      gst_element_link_many (source, filter, videoscale, sink, NULL);
     }
 
 
