@@ -34,13 +34,15 @@ class CameraManager
 
   void play_cam();
   void switch_effect(const gchar *effect_name);
-  void stop_cam();
+  void pause_cam();
+  void replay_cam();
 
   //  std::string *effect_name;
   const gchar *effect_name;
   Gtk::DrawingArea **video;
 
  protected:
+  void stop_cam();
   GstElement *pipeline, *bin, *source, *filter, *videoscale, *effect, *sink;
   GstBus *bus;
 };

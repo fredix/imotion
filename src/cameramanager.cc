@@ -112,28 +112,22 @@ CameraManager::play_cam ()
     //    return EXIT_FAILURE;
   }
 
-  if ( effect )
-    {
-      /* set up pipeline */
-      gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, effect, sink, NULL);
-      gst_bin_add (GST_BIN (pipeline), bin);
-      //gst_element_link (source, sink);
-      gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
-
-    }
-  else
-    {
-      /* set up pipeline */
-      gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, sink, NULL);
-      gst_bin_add (GST_BIN (pipeline), bin);
-      gst_element_link_many (source, filter, videoscale, sink, NULL);
-    }
+  if (effect) {
+    /* set up pipeline */
+    gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, effect, sink, NULL);
+    gst_bin_add (GST_BIN (pipeline), bin);
+    //gst_element_link (source, sink);
+    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
+  }
+  else {
+    /* set up pipeline */
+    gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, sink, NULL);
+    gst_bin_add (GST_BIN (pipeline), bin);
+    gst_element_link_many (source, filter, videoscale, sink, NULL);
+  }
 
 
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
-
-
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
   gst_bus_add_watch (bus, bus_callback, NULL);
 
@@ -154,8 +148,28 @@ CameraManager::stop_cam ()
       gst_element_set_state (pipeline, GST_STATE_NULL);
       g_print ("Deleting pipeline\n");
       gst_object_unref (GST_OBJECT (pipeline));
-      pipeline = bin = source = filter = effect = sink = NULL;
-      printf("stop cam\n");
+      pipeline = bin = source = filter = sink = NULL;
+      g_print ("Stop cam\n");
+    }
+}
+
+void
+CameraManager::pause_cam ()
+{
+  if ( pipeline )
+    {
+      gst_element_set_state (pipeline, GST_STATE_PAUSED);
+      g_print ("Paused pipeline\n");
+    }
+}
+
+void
+CameraManager::replay_cam ()
+{
+  if ( pipeline )
+    {
+      gst_element_set_state (pipeline, GST_STATE_PLAYING);
+      g_print ("Replay pipeline\n");
     }
 }
 
@@ -164,10 +178,12 @@ void
 CameraManager::switch_effect (const gchar *effect_name)
 {
   stop_cam();
-  if (!g_strrstr (effect_name, "none"))
-    {
-      effect = gst_element_factory_make (effect_name, "effect");
-    }
+  if (!g_strrstr (effect_name, "none")) {
+    effect = gst_element_factory_make (effect_name, "effect");
+  }
+  else {
+    effect = NULL;
+  }
   play_cam();
 
   printf("%s\n", effect_name);
@@ -182,6 +198,10 @@ CameraManager::~CameraManager ()
   //  gst_object_unref (pipeline);
   //  gst_object_unref (GST_OBJECT (source));
   //  gst_object_unref (GST_OBJECT (sink));
+
+  gst_element_set_state (pipeline, GST_STATE_NULL);
+  g_print ("Deleting pipeline\n");
+  gst_object_unref (GST_OBJECT (pipeline));
 
   gst_deinit ();
 }

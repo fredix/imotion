@@ -70,12 +70,12 @@ ImotionApp::ImotionApp ()
     }
 
 
-
-    gui_glade_xml->get_widget ("toolbutton_stop", stop_button);
-    if(stop_button)
+    gui_glade_xml->get_widget ("toolbutton_break", break_button);
+    if(break_button)
     {
-      stop_button->signal_clicked().connect( sigc::mem_fun(*this, &ImotionApp::on_stop_clicked) );
+      break_button->signal_toggled().connect( sigc::mem_fun(*this, &ImotionApp::on_break_toggled) );
     }
+
 
 
     gui_glade_xml->get_widget ("imagemenuitem_about", item_about);
@@ -112,24 +112,18 @@ ImotionApp::ImotionApp ()
     for (effect = effects; effect; effect = effect->next) {
       tmp = GST_ELEMENT_FACTORY(effect->data);
       fprintf(stderr, "Found effect: %s\n", GST_PLUGIN_FEATURE_NAME(tmp));
-      //  if (!strcmp(GST_PLUGIN_FEATURE_NAME(tmp), VISUALIZATION))
-      //  fac = tmp;
-
       row = *(effects_ListStore->append());
       row[columns.effect_name] = GST_PLUGIN_FEATURE_NAME(tmp);
-
-
     }
     g_list_free(effects);
 
 
     (*treeview_effects).append_column("Effects", columns.effect_name);
 
-
     treeSel = (*treeview_effects).get_selection();
-
     treeSel->signal_changed().connect( sigc::mem_fun(*this, &ImotionApp::on_selection_changed));
 
+    // sent the Gtk::DrawingArea's XID to stick the video's window on it
     m_cameramanager.video = &video;
     m_cameramanager.play_cam();
   }
@@ -221,11 +215,17 @@ void
 ImotionApp::on_selection_changed ()
 {
   m_cameramanager.switch_effect(treeSel->get_selected()->get_value(columns.effect_name).data());
+  break_button->set_active(false);
 }
 
 
 void
-ImotionApp::on_stop_clicked ()
+ImotionApp::on_break_toggled ()
 {
-  m_cameramanager.stop_cam();
+  if (break_button->get_active ()) {
+    m_cameramanager.pause_cam();
+  }
+  else {
+    m_cameramanager.replay_cam();
+  }
 }

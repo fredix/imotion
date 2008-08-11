@@ -55,7 +55,7 @@ class ImotionApp
  protected:
   virtual void on_quit_clicked();
   virtual void on_about_clicked();
-  virtual void on_stop_clicked();
+  virtual void on_break_toggled();
   virtual void on_selection_changed();
 
   Glib::RefPtr<Gtk::ListStore> effects_ListStore;
@@ -66,7 +66,8 @@ class ImotionApp
   Gtk::Window *main;
   Gtk::DrawingArea *video;
   Gtk::ToolButton *quit_button;
-  Gtk::ToolButton *stop_button;
+  Gtk::ToggleToolButton *break_button;
+
   Gtk::ImageMenuItem *item_about;
   Gtk::ImageMenuItem *item_quit;
   Gtk::ImageMenuItem *item_fullscreen;
