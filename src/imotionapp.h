@@ -44,8 +44,6 @@ public:
 
 class ImotionApp
 {
-  CameraManager m_cameramanager;
-
  public:
   ImotionApp();
   virtual ~ImotionApp();
@@ -57,6 +55,11 @@ class ImotionApp
   virtual void on_about_clicked();
   virtual void on_break_toggled();
   virtual void on_selection_changed();
+  virtual void on_fullscreen_start();
+  virtual void on_fullscreen_stop();
+
+  bool on_fullscreen_button_press_event(GdkEventButton* event);
+
 
   Glib::RefPtr<Gtk::ListStore> effects_ListStore;
   Glib::RefPtr<Gtk::TreeSelection> treeSel;
@@ -64,8 +67,11 @@ class ImotionApp
   Gtk::TreeModelColumn<Glib::ustring> name_effect;
   Gtk::TreeView *treeview_effects;
   Gtk::Window *main;
+  Gtk::Window *window_fullscreen;
   Gtk::DrawingArea *video;
+  Gtk::DrawingArea *draw_fullscreen;
   Gtk::ToolButton *quit_button;
+  Gtk::ToolButton *fullscreen_button;
   Gtk::ToggleToolButton *break_button;
 
   Gtk::ImageMenuItem *item_about;
@@ -78,6 +84,7 @@ class ImotionApp
   GList* effect;
   GstElementFactory *tmp;
 
+  CameraManager m_cameramanager;
   ModelColumns columns;
 };
 

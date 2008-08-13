@@ -57,6 +57,14 @@ ImotionApp::ImotionApp ()
     }
   if (main)
   {
+
+    gui_glade_xml->get_widget ("toolbutton_fullscreen", fullscreen_button);
+    if(fullscreen_button)
+    {
+      fullscreen_button->signal_clicked().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_start) );
+    }
+
+
     gui_glade_xml->get_widget ("toolbutton_quit", quit_button);
     if(quit_button)
     {
@@ -77,18 +85,34 @@ ImotionApp::ImotionApp ()
     }
 
 
-
     gui_glade_xml->get_widget ("imagemenuitem_about", item_about);
     if (item_about)
     {
       item_about->signal_activate().connect( sigc::mem_fun(*this, &ImotionApp::on_about_clicked) );
     }
 
+    gui_glade_xml->get_widget ("window_fullscreen", window_fullscreen);
+
 
     gui_glade_xml->get_widget ("treeview_effects", treeview_effects);
+    gui_glade_xml->get_widget ("drawingarea_full_video", draw_fullscreen);
+
+
 
 
     gui_glade_xml->get_widget ("drawingarea_video", video);
+
+
+    if (draw_fullscreen)
+      {
+        //        draw_fullscreen->signal_button_press_event().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_stop) );
+
+
+        draw_fullscreen->add_events( Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK |
+                                      Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK );
+        draw_fullscreen->signal_button_press_event().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_button_press_event) );
+      }
+
 
     // main->show_all();
     // std::cout << gdk_x11_drawable_get_xid( video->get_window()->gobj()) << "\n";
@@ -228,4 +252,37 @@ ImotionApp::on_break_toggled ()
   else {
     m_cameramanager.replay_cam();
   }
+}
+
+void
+ImotionApp::on_fullscreen_start ()
+{
+  m_cameramanager.video = &draw_fullscreen;
+  window_fullscreen->show();
+  window_fullscreen->fullscreen();
+}
+
+void
+ImotionApp::on_fullscreen_stop ()
+{
+  m_cameramanager.video = &video;
+  window_fullscreen->unfullscreen();
+  window_fullscreen->hide();
+}
+
+
+
+
+bool
+ImotionApp::on_fullscreen_button_press_event(GdkEventButton* event)
+{
+  if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+    std::cout << "exit from fullscreen" << std::endl;
+    on_fullscreen_stop ();
+  }
+  else {
+    printf("gni\n");
+  }
+
+  return true;
 }
