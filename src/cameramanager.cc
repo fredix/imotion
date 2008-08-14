@@ -68,8 +68,6 @@ gboolean bus_callback (GstBus *bus,
   default:
     /* unhandled message */
 
-    //    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), Cameramanager::pVideo);
-
     break;
   }
   /* we want to be notified again the next time there is a message
@@ -83,6 +81,7 @@ gboolean bus_callback (GstBus *bus,
 CameraManager::CameraManager ()
 {
  pipeline = bin = source = filter = effect = sink = NULL;
+  effect_name = g_strdup("none");
 }
 
 

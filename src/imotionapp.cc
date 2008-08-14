@@ -65,6 +65,13 @@ ImotionApp::ImotionApp ()
     }
 
 
+    gui_glade_xml->get_widget ("imagemenuitem_fullscreen", item_fullscreen);
+    if(item_fullscreen)
+    {
+      item_fullscreen->signal_activate().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_start) );
+    }
+
+
     gui_glade_xml->get_widget ("toolbutton_quit", quit_button);
     if(quit_button)
     {
@@ -105,11 +112,8 @@ ImotionApp::ImotionApp ()
 
     if (draw_fullscreen)
       {
-        //        draw_fullscreen->signal_button_press_event().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_stop) );
-
-
         draw_fullscreen->add_events( Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK |
-                                      Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK );
+                                     Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK );
         draw_fullscreen->signal_button_press_event().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_button_press_event) );
       }
 

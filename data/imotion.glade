@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Wed Aug 13 02:04:51 2008 -->
+<!--Generated with glade3 3.4.4 on Thu Aug 14 03:20:14 2008 -->
 <glade-interface>
   <requires lib="canvas"/>
   <widget class="GtkAboutDialog" id="aboutdialog">
@@ -202,7 +202,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="headers_visible">False</property>
-                            <property name="enable_search">False</property>
                           </widget>
                         </child>
                       </widget>
