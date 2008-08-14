@@ -258,6 +258,7 @@ void
 ImotionApp::on_fullscreen_start ()
 {
   m_cameramanager.video = &draw_fullscreen;
+  m_cameramanager.restart();
   window_fullscreen->show();
   window_fullscreen->fullscreen();
 }
@@ -266,6 +267,7 @@ void
 ImotionApp::on_fullscreen_stop ()
 {
   m_cameramanager.video = &video;
+  m_cameramanager.restart();
   window_fullscreen->unfullscreen();
   window_fullscreen->hide();
 }

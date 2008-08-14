@@ -33,12 +33,13 @@ class CameraManager
   virtual ~CameraManager();
 
   void play_cam();
-  void switch_effect(const gchar *effect_name);
+  void switch_effect(const gchar *name);
   void pause_cam();
   void replay_cam();
+  void restart();
 
   //  std::string *effect_name;
-  const gchar *effect_name;
+  gchar *effect_name;
   Gtk::DrawingArea **video;
 
  protected:

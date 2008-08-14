@@ -175,8 +175,9 @@ CameraManager::replay_cam ()
 
 
 void
-CameraManager::switch_effect (const gchar *effect_name)
+CameraManager::switch_effect (const gchar *name)
 {
+  effect_name = g_strdup(name);
   stop_cam();
   if (!g_strrstr (effect_name, "none")) {
     effect = gst_element_factory_make (effect_name, "effect");
@@ -187,6 +188,14 @@ CameraManager::switch_effect (const gchar *effect_name)
   play_cam();
 
   printf("%s\n", effect_name);
+}
+
+
+
+void
+CameraManager::restart ()
+{
+  switch_effect(effect_name);
 }
 
 
