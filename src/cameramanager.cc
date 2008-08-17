@@ -1,5 +1,5 @@
 /*
- *  ui
+ *  cameramanager
  *  Copyright (C) 2008 Frédéric Logier
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,126 +24,128 @@ GstBusSyncReply
 //create_window (GstBus * bus, GstMessage * message, GstPipeline * pipeline)
 create_window (GstBus * bus, GstMessage * message, Gtk::DrawingArea *data)
 {
-  // GstXOverlay *sink = GST_X_OVERLAY(user_data);
+    // GstXOverlay *sink = GST_X_OVERLAY(user_data);
 
- // ignore anything but 'prepare-xwindow-id' element messages
- if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
-   return GST_BUS_PASS;
+    // ignore anything but 'prepare-xwindow-id' element messages
+    if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
+        return GST_BUS_PASS;
 
- if (!gst_structure_has_name (message->structure, "prepare-xwindow-id"))
-   return GST_BUS_PASS;
+    if (!gst_structure_has_name (message->structure, "prepare-xwindow-id"))
+        return GST_BUS_PASS;
 
- XID video = gdk_x11_drawable_get_xid( data->get_window()->gobj());
+    XID video = gdk_x11_drawable_get_xid( data->get_window()->gobj());
 
- gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
+    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
 
- gst_message_unref (message);
+    gst_message_unref (message);
 
- return GST_BUS_DROP;
+    return GST_BUS_DROP;
 }
 
 
 static
-gboolean bus_callback (GstBus *bus,
+gboolean bus_callback (GstBus *m_bus,
                        GstMessage *message,
                        gpointer    data)
 {
-  //  GMainLoop *loop = (GMainLoop *) data;
-  g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
-  switch (GST_MESSAGE_TYPE (message)) {
-  case GST_MESSAGE_ERROR: {
-    GError *err;
-    gchar *debug;
-    gst_message_parse_error (message, &err, &debug);
-    g_print ("Error: %s\n", err->message);
-    g_error_free (err);
-    g_free (debug);
-    //    g_main_loop_quit (loop);
-    break;
-  }
-  case GST_MESSAGE_EOS:
-    /* end-of-stream */
-    //    g_main_loop_quit (loop);
-    break;
-  default:
-    /* unhandled message */
+    //  GMainLoop *loop = (GMainLoop *) data;
+    g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
+    switch (GST_MESSAGE_TYPE (message)) {
+    case GST_MESSAGE_ERROR: {
+        GError *err;
+        gchar *debug;
+        gst_message_parse_error (message, &err, &debug);
+        std::cout << "Error : ";
+        std::cout << err->message << std::endl;
 
-    break;
-  }
-  /* we want to be notified again the next time there is a message
-   * on the bus, so returning TRUE (FALSE means we want to stop watching
-   * for messages on the bus and our callback should not be called again)
-   */
-  return TRUE;
+        g_error_free (err);
+        g_free (debug);
+        //    g_main_loop_quit (loop);
+        break;
+    }
+    case GST_MESSAGE_EOS:
+        /* end-of-stream */
+        //    g_main_loop_quit (loop);
+        break;
+    default:
+        /* unhandled message */
+
+        break;
+    }
+    /* we want to be notified again the next time there is a message
+     * on the bus, so returning TRUE (FALSE means we want to stop watching
+     * for messages on the bus and our callback should not be called again)
+     */
+    return TRUE;
 }
 
 
 CameraManager::CameraManager ()
 {
- pipeline = bin = source = filter = effect = sink = NULL;
-  effect_name = "none";
+    m_pipeline = m_bin = m_source = m_filter = m_effect = m_sink = 0;
+    m_effect_name = "none";
 }
 
 
 void
 CameraManager::play_cam ()
 {
-  pipeline = gst_pipeline_new ("pipeline");
-  bin = gst_bin_new ("bin");
+    m_pipeline = gst_pipeline_new ("pipeline");
+    m_bin = gst_bin_new ("bin");
 
-  source = gst_element_factory_make ("v4l2src", "video_src");
-  if (!source) {
-    g_print ("Failed to create source of type 'v4l2src'\n");
-    //    return EXIT_FAILURE;
-  }
-
-
-  filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
-
-  videoscale = gst_element_factory_make ("videoscale", "video_scale");
+    m_source = gst_element_factory_make ("v4l2src", "video_src");
+    if (!m_source) {
+        std::cout << "Failed to create source of type 'v4l2src'" << std::endl;
+        //    return EXIT_FAILURE;
+    }
 
 
-  sink = gst_element_factory_make ("ximagesink", "video_sink");
+    m_filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
 
-  //   sink = gst_element_factory_make ("sdlvideosink", "video_sink");
-  if (!sink) {
-    g_print ("Failed to create sink of type 'sdlvideosink'\n");
-    //    return EXIT_FAILURE;
-  }
-
-  if (effect) {
-    /* set up pipeline */
-    gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, effect, sink, NULL);
-    gst_bin_add (GST_BIN (pipeline), bin);
-    //    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
-    gst_element_link_pads (source, "src", filter, "sink");
-    gst_element_link_pads (filter, "src", videoscale, "sink");
-    gst_element_link_pads (videoscale, "src", effect, "sink");
-    gst_element_link_pads (effect, "src", sink, "sink");
+    m_videoscale = gst_element_factory_make ("videoscale", "video_scale");
 
 
-  }
-  else {
-    /* set up pipeline */
-    gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, sink, NULL);
-    gst_bin_add (GST_BIN (pipeline), bin);
-    //    gst_element_link_many (source, filter, videoscale, sink, NULL);
+    m_sink = gst_element_factory_make ("ximagesink", "video_sink");
 
-    gst_element_link_pads (source, "src", filter, "sink");
-    gst_element_link_pads (filter, "src", videoscale, "sink");
-    gst_element_link_pads (videoscale, "src", sink, "sink");
-  }
+    //   sink = gst_element_factory_make ("sdlvideosink", "video_sink");
+    if (!m_sink) {
+        std::cout << "Failed to create sink of type 'sdlvideosink'" << std::endl;
+        //    return EXIT_FAILURE;
+    }
+
+    if (m_effect) {
+        /* set up pipeline */
+        gst_bin_add_many (GST_BIN (m_bin), m_source, m_filter, m_videoscale, m_effect, m_sink, NULL);
+        gst_bin_add (GST_BIN (m_pipeline), m_bin);
+        //    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
+        gst_element_link_pads (m_source, "src", m_filter, "sink");
+        gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
+        gst_element_link_pads (m_videoscale, "src", m_effect, "sink");
+        gst_element_link_pads (m_effect, "src", m_sink, "sink");
 
 
-  gst_element_set_state (pipeline, GST_STATE_PLAYING);
-  bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
-  gst_bus_add_watch (bus, bus_callback, NULL);
+    }
+    else {
+        /* set up pipeline */
+        gst_bin_add_many (GST_BIN (m_bin), m_source, m_filter, m_videoscale, m_sink, NULL);
+        gst_bin_add (GST_BIN (m_pipeline), m_bin);
+        //    gst_element_link_many (source, filter, videoscale, sink, NULL);
+
+        gst_element_link_pads (m_source, "src", m_filter, "sink");
+        gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
+        gst_element_link_pads (m_videoscale, "src", m_sink, "sink");
+    }
 
 
-  gst_bus_set_sync_handler (bus, (GstBusSyncHandler) create_window, *video);
+    gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
+    m_bus = gst_pipeline_get_bus (GST_PIPELINE (m_pipeline));
+    gst_bus_add_watch (m_bus, bus_callback, NULL);
 
-  //  g_signal_connect (bus, "message::error", G_CALLBACK (cb_message_error), NULL);
-  //  g_signal_connect (bus, "message::eos", G_CALLBACK (cb_message_eos), NULL);
+
+    gst_bus_set_sync_handler (m_bus, (GstBusSyncHandler) create_window, *m_video);
+
+    //  g_signal_connect (bus, "message::error", G_CALLBACK (cb_message_error), NULL);
+    //  g_signal_connect (bus, "message::eos", G_CALLBACK (cb_message_eos), NULL);
 
 
 }
@@ -151,51 +153,50 @@ CameraManager::play_cam ()
 void
 CameraManager::stop_cam ()
 {
-  if ( pipeline )
+    if ( m_pipeline )
     {
-      gst_element_set_state (pipeline, GST_STATE_NULL);
-      g_print ("Deleting pipeline\n");
-      gst_object_unref (GST_OBJECT (pipeline));
-      pipeline = bin = source = filter = sink = NULL;
-      g_print ("Stop cam\n");
+        gst_element_set_state (m_pipeline, GST_STATE_NULL);
+        std::cout << "Deleting pipeline" << std::endl;
+        gst_object_unref (GST_OBJECT (m_pipeline));
+        m_pipeline = m_bin = m_source = m_filter = m_sink = 0;
+        std::cout << "Stop cam" << std::endl;
     }
 }
 
 void
 CameraManager::pause_cam ()
 {
-  if ( pipeline )
+    if ( m_pipeline )
     {
-      gst_element_set_state (pipeline, GST_STATE_PAUSED);
-      g_print ("Paused pipeline\n");
+        gst_element_set_state (m_pipeline, GST_STATE_PAUSED);
+        std::cout << "Paused pipeline" << std::endl;
     }
 }
 
 void
 CameraManager::replay_cam ()
 {
-  if ( pipeline )
+    if ( m_pipeline )
     {
-      gst_element_set_state (pipeline, GST_STATE_PLAYING);
-      g_print ("Replay pipeline\n");
+        gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
+        std::cout << "Replay pipeline" << std::endl;
     }
 }
 
 
 void
-CameraManager::switch_effect (Glib::ustring name)
+CameraManager::switch_effect (Glib::ustring a_name)
 {
-  effect_name = name;
-  stop_cam();
-  if ( effect_name != "none") {
-    effect = gst_element_factory_make (effect_name.c_str(), "effect");
-  }
-  else {
-    effect = NULL;
-  }
-  play_cam();
-
-  g_print("%s\n", effect_name.c_str());
+    m_effect_name = a_name;
+    stop_cam();
+    if ( m_effect_name != "none") {
+        m_effect = gst_element_factory_make (m_effect_name.c_str(), "effect");
+    }
+    else {
+        m_effect = 0;
+    }
+    play_cam();
+    std::cout << m_effect_name << std::endl;
 }
 
 
@@ -203,24 +204,23 @@ CameraManager::switch_effect (Glib::ustring name)
 void
 CameraManager::restart ()
 {
-  switch_effect(effect_name.c_str());
+    switch_effect(m_effect_name.c_str());
 }
 
 
 CameraManager::~CameraManager ()
 {
-  /* clean up */
-  //  gst_element_set_state (pipeline, GST_STATE_NULL);
-  //  gst_object_unref (bus);
-  //  gst_object_unref (pipeline);
-  //  gst_object_unref (GST_OBJECT (source));
-  //  gst_object_unref (GST_OBJECT (sink));
+    /* clean up */
+    //  gst_element_set_state (pipeline, GST_STATE_NULL);
+    //  gst_object_unref (bus);
+    //  gst_object_unref (pipeline);
+    //  gst_object_unref (GST_OBJECT (source));
+    //  gst_object_unref (GST_OBJECT (sink));
 
-  gst_element_set_state (pipeline, GST_STATE_NULL);
-  g_print ("Deleting pipeline\n");
-  gst_object_unref (GST_OBJECT (pipeline));
-
-  gst_deinit ();
+    gst_element_set_state (m_pipeline, GST_STATE_NULL);
+    std::cout << "Deleting pipeline" << std::endl;
+    gst_object_unref (GST_OBJECT (m_pipeline));
+    gst_deinit ();
 }
 
 

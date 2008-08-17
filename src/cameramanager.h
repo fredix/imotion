@@ -1,5 +1,5 @@
 /*
- *  ui
+ *  cameramanager
  *  Copyright (C) 2008 Frédéric Logier
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #ifndef CAMERAMANAGER_H
 #define CAMERAMANAGER_H
 
+#include <iostream>
 #include <gstreamermm.h>
 #include <gtkmm.h>
 #include <gst/interfaces/xoverlay.h>
@@ -28,24 +29,24 @@
 
 class CameraManager
 {
- public:
-  CameraManager();
-  virtual ~CameraManager();
+public:
+    CameraManager ();
+    virtual ~CameraManager ();
 
-  void play_cam();
-  void switch_effect(Glib::ustring name);
-  void pause_cam();
-  void replay_cam();
-  void restart();
+    void play_cam ();
+    void switch_effect (Glib::ustring a_name);
+    void pause_cam ();
+    void replay_cam ();
+    void restart ();
 
-  //  std::string *effect_name;
-  Glib::ustring effect_name;
-  Gtk::DrawingArea **video;
+    //  std::string *effect_name;
+    Glib::ustring m_effect_name;
+    Gtk::DrawingArea **m_video;
 
- protected:
-  void stop_cam();
-  GstElement *pipeline, *bin, *source, *filter, *videoscale, *effect, *sink;
-  GstBus *bus;
+protected:
+    void stop_cam ();
+    GstElement *m_pipeline, *m_bin, *m_source, *m_filter, *m_videoscale, *m_effect, *m_sink;
+    GstBus *m_bus;
 };
 
 #endif // CAMERAMANAGER_H

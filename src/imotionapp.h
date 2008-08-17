@@ -34,58 +34,53 @@
 class ModelColumns : public Gtk::TreeModel::ColumnRecord
 {
 public:
+    ModelColumns ()
+    { add(m_effect_name); }
 
-  ModelColumns()
-    { add(effect_name); }
-
-  Gtk::TreeModelColumn<Glib::ustring> effect_name;
+    Gtk::TreeModelColumn<Glib::ustring> m_effect_name;
 };
 
 
 class ImotionApp
 {
- public:
-  ImotionApp();
-  virtual ~ImotionApp();
-  virtual Gtk::Window* get_main_window() const { return main; }
-  //  virtual Gtk::DrawingArea** get_video() { return &video; };
+public:
+    ImotionApp ();
+    virtual ~ImotionApp ();
+    virtual Gtk::Window* get_main_window () const { return m_main; }
+    //  virtual Gtk::DrawingArea** get_video() { return &video; };
 
- protected:
-  virtual void on_quit_clicked();
-  virtual void on_about_clicked();
-  virtual void on_break_toggled();
-  virtual void on_selection_changed();
-  virtual void on_fullscreen_start();
-  virtual void on_fullscreen_stop();
+protected:
+    virtual void on_quit_clicked ();
+    virtual void on_about_clicked ();
+    virtual void on_break_toggled ();
+    virtual void on_selection_changed ();
+    virtual void on_fullscreen_start ();
+    virtual void on_fullscreen_stop ();
 
-  bool on_fullscreen_button_press_event(GdkEventButton* event);
+    bool on_fullscreen_button_press_event (GdkEventButton* event);
 
 
-  Glib::RefPtr<Gtk::ListStore> effects_ListStore;
-  Glib::RefPtr<Gtk::TreeSelection> treeSel;
+    Glib::RefPtr<Gtk::ListStore> m_effects_ListStore;
+    Glib::RefPtr<Gtk::TreeSelection> m_treeSel;
 
-  Gtk::TreeModelColumn<Glib::ustring> name_effect;
-  Gtk::TreeView *treeview_effects;
-  Gtk::Window *main;
-  Gtk::Window *window_fullscreen;
-  Gtk::DrawingArea *video;
-  Gtk::DrawingArea *draw_fullscreen;
-  Gtk::ToolButton *quit_button;
-  Gtk::ToolButton *fullscreen_button;
-  Gtk::ToggleToolButton *break_button;
+    Gtk::TreeModelColumn<Glib::ustring> m_name_effect;
+    Gtk::TreeView *m_treeview_effects;
+    Gtk::Window *m_main;
+    Gtk::Window *m_window_fullscreen;
+    Gtk::DrawingArea *m_video;
+    Gtk::DrawingArea *m_draw_fullscreen;
+    Gtk::ToolButton *m_quit_button;
+    Gtk::ToolButton *m_fullscreen_button;
+    Gtk::ToggleToolButton *m_break_button;
 
-  Gtk::ImageMenuItem *item_about;
-  Gtk::ImageMenuItem *item_quit;
-  Gtk::ImageMenuItem *item_fullscreen;
-  Gtk::AboutDialog *about_dialog;
-  Glib::RefPtr<Gnome::Glade::Xml> gui_glade_xml;
+    Gtk::ImageMenuItem *m_item_about;
+    Gtk::ImageMenuItem *m_item_quit;
+    Gtk::ImageMenuItem *m_item_fullscreen;
+    Gtk::AboutDialog *m_about_dialog;
+    Glib::RefPtr<Gnome::Glade::Xml> m_gui_glade_xml;
 
-  GList* effects;
-  GList* effect;
-  GstElementFactory *tmp;
-
-  CameraManager m_cameramanager;
-  ModelColumns columns;
+    CameraManager m_cameramanager;
+    ModelColumns m_columns;
 };
 
 #endif // IMOTIONAPP_H
