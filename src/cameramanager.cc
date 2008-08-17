@@ -81,7 +81,7 @@ gboolean bus_callback (GstBus *bus,
 CameraManager::CameraManager ()
 {
  pipeline = bin = source = filter = effect = sink = NULL;
-  effect_name = g_strdup("none");
+  effect_name = "none";
 }
 
 
@@ -115,14 +115,23 @@ CameraManager::play_cam ()
     /* set up pipeline */
     gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, effect, sink, NULL);
     gst_bin_add (GST_BIN (pipeline), bin);
-    //gst_element_link (source, sink);
-    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
+    //    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
+    gst_element_link_pads (source, "src", filter, "sink");
+    gst_element_link_pads (filter, "src", videoscale, "sink");
+    gst_element_link_pads (videoscale, "src", effect, "sink");
+    gst_element_link_pads (effect, "src", sink, "sink");
+
+
   }
   else {
     /* set up pipeline */
     gst_bin_add_many (GST_BIN (bin), source, filter, videoscale, sink, NULL);
     gst_bin_add (GST_BIN (pipeline), bin);
-    gst_element_link_many (source, filter, videoscale, sink, NULL);
+    //    gst_element_link_many (source, filter, videoscale, sink, NULL);
+
+    gst_element_link_pads (source, "src", filter, "sink");
+    gst_element_link_pads (filter, "src", videoscale, "sink");
+    gst_element_link_pads (videoscale, "src", sink, "sink");
   }
 
 
@@ -174,19 +183,19 @@ CameraManager::replay_cam ()
 
 
 void
-CameraManager::switch_effect (const gchar *name)
+CameraManager::switch_effect (Glib::ustring name)
 {
-  effect_name = g_strdup(name);
+  effect_name = name;
   stop_cam();
-  if (!g_strrstr (effect_name, "none")) {
-    effect = gst_element_factory_make (effect_name, "effect");
+  if ( effect_name != "none") {
+    effect = gst_element_factory_make (effect_name.c_str(), "effect");
   }
   else {
     effect = NULL;
   }
   play_cam();
 
-  printf("%s\n", effect_name);
+  g_print("%s\n", effect_name.c_str());
 }
 
 
@@ -194,7 +203,7 @@ CameraManager::switch_effect (const gchar *name)
 void
 CameraManager::restart ()
 {
-  switch_effect(effect_name);
+  switch_effect(effect_name.c_str());
 }
 
 

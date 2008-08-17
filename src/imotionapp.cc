@@ -112,8 +112,11 @@ ImotionApp::ImotionApp ()
 
     if (draw_fullscreen)
       {
-        draw_fullscreen->add_events( Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK |
-                                     Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK );
+        /*
+         *   no need to use add_event, just need to choose event from glade !
+         *  draw_fullscreen->add_events( Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK |
+         *                            Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK );
+         */
         draw_fullscreen->signal_button_press_event().connect( sigc::mem_fun(*this, &ImotionApp::on_fullscreen_button_press_event) );
       }
 
@@ -242,7 +245,7 @@ ImotionApp::on_about_clicked ()
 void
 ImotionApp::on_selection_changed ()
 {
-  m_cameramanager.switch_effect(treeSel->get_selected()->get_value(columns.effect_name).data());
+  m_cameramanager.switch_effect(treeSel->get_selected()->get_value(columns.effect_name));
   break_button->set_active(false);
 }
 
