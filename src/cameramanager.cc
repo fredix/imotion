@@ -80,11 +80,17 @@ gboolean bus_callback (GstBus *m_bus,
 }
 
 
-CameraManager::CameraManager ()
+CameraManager::CameraManager () : m_effect_name("none"), m_pipeline(0), m_bin(0), m_source(0), m_filter(0), m_videoscale(0), m_effect(0), m_sink(0)
 {
-    m_pipeline = m_bin = m_source = m_filter = m_effect = m_sink = 0;
-    m_effect_name = "none";
+    gst_init (NULL, NULL);
 }
+
+void
+CameraManager::set_video (Gtk::DrawingArea **a_video)
+{
+    m_video = a_video;
+}
+
 
 
 void
@@ -204,7 +210,7 @@ CameraManager::switch_effect (Glib::ustring a_name)
 void
 CameraManager::restart ()
 {
-    switch_effect(m_effect_name.c_str());
+    switch_effect (m_effect_name);
 }
 
 

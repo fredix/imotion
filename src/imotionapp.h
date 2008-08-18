@@ -35,7 +35,7 @@ class ModelColumns : public Gtk::TreeModel::ColumnRecord
 {
 public:
     ModelColumns ()
-    { add(m_effect_name); }
+    { add (m_effect_name); }
 
     Gtk::TreeModelColumn<Glib::ustring> m_effect_name;
 };
@@ -47,7 +47,6 @@ public:
     ImotionApp ();
     virtual ~ImotionApp ();
     virtual Gtk::Window* get_main_window () const { return m_main; }
-    //  virtual Gtk::DrawingArea** get_video() { return &video; };
 
 protected:
     virtual void on_quit_clicked ();
@@ -67,13 +66,12 @@ protected:
     Gtk::TreeView *m_treeview_effects;
     Gtk::Window *m_main;
     Gtk::Window *m_window_fullscreen;
+    Gtk::ToolButton *m_quit_button;
+    Gtk::ImageMenuItem *m_item_about;
     Gtk::DrawingArea *m_video;
     Gtk::DrawingArea *m_draw_fullscreen;
-    Gtk::ToolButton *m_quit_button;
     Gtk::ToolButton *m_fullscreen_button;
     Gtk::ToggleToolButton *m_break_button;
-
-    Gtk::ImageMenuItem *m_item_about;
     Gtk::ImageMenuItem *m_item_quit;
     Gtk::ImageMenuItem *m_item_fullscreen;
     Gtk::AboutDialog *m_about_dialog;

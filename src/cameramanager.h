@@ -33,18 +33,17 @@ public:
     CameraManager ();
     virtual ~CameraManager ();
 
+    void set_video (Gtk::DrawingArea **a_video);
     void play_cam ();
     void switch_effect (Glib::ustring a_name);
     void pause_cam ();
     void replay_cam ();
     void restart ();
 
-    //  std::string *effect_name;
-    Glib::ustring m_effect_name;
-    Gtk::DrawingArea **m_video;
-
 protected:
     void stop_cam ();
+    Gtk::DrawingArea **m_video;
+    Glib::ustring m_effect_name;
     GstElement *m_pipeline, *m_bin, *m_source, *m_filter, *m_videoscale, *m_effect, *m_sink;
     GstBus *m_bus;
 };

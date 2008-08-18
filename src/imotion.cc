@@ -1,5 +1,5 @@
 /*
- *  main
+ *  imotion
  *  Copyright (C) 2008 Frédéric Logier
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,19 +22,17 @@
 int
 main (int argc, char **argv)
 {
-  Gtk::Main kit(argc, argv);
-  gst_init (&argc, &argv);
+    Gtk::Main kit(argc, argv);
 
-  ImotionApp imotionapp;
+    ImotionApp imotionapp;
 
-  if ( Gtk::Window* main = imotionapp.get_main_window () )
+    if (Gtk::Window* main = imotionapp.get_main_window ())
     {
-      Gtk::Main::run (*main);
+        Gtk::Main::run (*main);
     }
-  else
+    else
     {
-      return EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
-
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

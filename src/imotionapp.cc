@@ -22,12 +22,8 @@
 
 
 
-ImotionApp::ImotionApp ()
+ImotionApp::ImotionApp () : m_main(0), m_quit_button(0), m_item_about(0), m_video(0)
 {
-    m_main =  0;
-    m_quit_button = 0;
-    m_item_about = 0;
-    m_video = 0;
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
@@ -154,8 +150,8 @@ ImotionApp::ImotionApp ()
         m_treeSel->signal_changed().connect( sigc::mem_fun(*this, &ImotionApp::on_selection_changed));
 
         // sent the Gtk::DrawingArea's XID to stick the video's window on it
-        m_cameramanager.m_video = &m_video;
-        m_cameramanager.play_cam();
+        m_cameramanager.set_video (&m_video);
+        m_cameramanager.play_cam ();
     }
     else
     {
@@ -253,29 +249,29 @@ void
 ImotionApp::on_break_toggled ()
 {
     if (m_break_button->get_active ()) {
-        m_cameramanager.pause_cam();
+        m_cameramanager.pause_cam ();
     }
     else {
-        m_cameramanager.replay_cam();
+        m_cameramanager.replay_cam ();
     }
 }
 
 void
 ImotionApp::on_fullscreen_start ()
 {
-    m_cameramanager.m_video = &m_draw_fullscreen;
-    m_cameramanager.restart();
-    m_window_fullscreen->show();
-    m_window_fullscreen->fullscreen();
+    m_cameramanager.set_video (&m_draw_fullscreen);
+    m_cameramanager.restart ();
+    m_window_fullscreen->show ();
+    m_window_fullscreen->fullscreen ();
 }
 
 void
 ImotionApp::on_fullscreen_stop ()
 {
-    m_cameramanager.m_video = &m_video;
-    m_cameramanager.restart();
-    m_window_fullscreen->unfullscreen();
-    m_window_fullscreen->hide();
+    m_cameramanager.set_video (&m_video);
+    m_cameramanager.restart ();
+    m_window_fullscreen->unfullscreen ();
+    m_window_fullscreen->hide ();
 }
 
 
