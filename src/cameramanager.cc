@@ -34,9 +34,7 @@ create_window (GstBus * bus, GstMessage * message, Gtk::DrawingArea *data)
         return GST_BUS_PASS;
 
     XID video = gdk_x11_drawable_get_xid( data->get_window()->gobj());
-
     gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
-
     gst_message_unref (message);
 
     return GST_BUS_DROP;
@@ -76,6 +74,13 @@ gboolean bus_callback (GstBus *m_bus,
      * on the bus, so returning TRUE (FALSE means we want to stop watching
      * for messages on the bus and our callback should not be called again)
      */
+
+//    XID video = gdk_x11_drawable_get_xid( GTK_WIDGET(data)->window);
+
+//    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
+
+
+
     return TRUE;
 }
 
@@ -111,11 +116,15 @@ CameraManager::play_cam ()
     m_videoscale = gst_element_factory_make ("videoscale", "video_scale");
 
 
+//    m_effect = gst_element_factory_make ("edgetv", "effect");
+
+
+
     m_sink = gst_element_factory_make ("ximagesink", "video_sink");
 
     //   sink = gst_element_factory_make ("sdlvideosink", "video_sink");
     if (!m_sink) {
-        std::cout << "Failed to create sink of type 'sdlvideosink'" << std::endl;
+        std::cout << "Failed to create sink of type 'ximagesink'" << std::endl;
         //    return EXIT_FAILURE;
     }
 
@@ -140,6 +149,7 @@ CameraManager::play_cam ()
         gst_element_link_pads (m_source, "src", m_filter, "sink");
         gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
         gst_element_link_pads (m_videoscale, "src", m_sink, "sink");
+
     }
 
 
@@ -168,6 +178,21 @@ CameraManager::stop_cam ()
         std::cout << "Stop cam" << std::endl;
     }
 }
+/*
+void
+CameraManager::stop_flow ()
+{
+    if ( m_pipeline )
+    {
+
+        gboolean  gst_pad_set_blocked (GstPad *pad,
+                                       gboolean blocked);
+
+        std::cout << "Flow stopped" << std::endl;
+    }
+}
+*/
+
 
 void
 CameraManager::pause_cam ()
@@ -194,14 +219,64 @@ void
 CameraManager::switch_effect (Glib::ustring a_name)
 {
     m_effect_name = a_name;
-    stop_cam();
-    if ( m_effect_name != "none") {
+
+    GstPad *pad = gst_element_get_static_pad (m_source, "src");
+    gst_pad_set_blocked (pad, TRUE);
+    std::cout << "blocked source pad" << std::endl;
+
+    if (m_effect)
+    {
+        // remove effect element
+        gst_element_set_state (m_effect, GST_STATE_NULL);
+        gst_bin_remove (GST_BIN (m_bin), m_effect);
+
+    }
+    else
+    {
+        gst_element_unlink_pads (m_videoscale,
+                                 "src",
+                                 m_sink,
+                                 "sink");
+    }
+
+
+    if ( m_effect_name != "none")
+    {
         m_effect = gst_element_factory_make (m_effect_name.c_str(), "effect");
+        gst_bin_add (GST_BIN (m_bin), m_effect);
+        gst_element_link_pads (m_videoscale,
+                               "src",
+                               m_effect,
+                               "sink");
+        gst_element_link_pads (m_effect,
+                               "src",
+                               m_sink,
+                               "sink");
+        gst_element_set_state (m_effect, GST_STATE_PLAYING);
+        std::cout << "new effect and linked in" << std::endl;
     }
-    else {
+    else
+    {
+        gst_element_unlink_pads (m_videoscale,
+                                 "src",
+                                 m_effect,
+                                 "sink");
+
+        gst_element_link_pads (m_videoscale,
+                               "src",
+                               m_sink,
+                               "sink");
+
+
         m_effect = 0;
+        std::cout << "no effect" << std::endl;
+
     }
-    play_cam();
+
+
+    gst_pad_set_blocked (pad, FALSE);
+    std::cout << "unblocked source pad" << std::endl;
+
     std::cout << m_effect_name << std::endl;
 }
 
@@ -210,7 +285,13 @@ CameraManager::switch_effect (Glib::ustring a_name)
 void
 CameraManager::restart ()
 {
-    switch_effect (m_effect_name);
+//    switch_effect (m_effect_name);
+//    XID video = gdk_x11_drawable_get_xid (m_video->get_window()->gobj() );
+
+//    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
+//    gst_bus_set_sync_handler (NULL, NULL, NULL);
+//    gst_bus_set_sync_handler (m_bus, (GstBusSyncHandler) create_window, *m_video);
+
 }
 
 

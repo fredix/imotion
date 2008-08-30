@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.4 on Fri Aug 15 01:23:54 2008 -->
+<!--Generated with glade3 3.4.4 on Sat Aug 30 06:27:43 2008 -->
 <glade-interface>
   <widget class="GtkAboutDialog" id="aboutdialog">
     <property name="border_width">5</property>
@@ -39,8 +39,8 @@
   </widget>
   <widget class="GtkWindow" id="main">
     <property name="title">iMotion</property>
-    <property name="default_width">800</property>
-    <property name="default_height">600</property>
+    <property name="default_width">625</property>
+    <property name="default_height">614</property>
     <child>
       <widget class="GtkVBox" id="vbox2">
         <property name="visible">True</property>
