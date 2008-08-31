@@ -262,6 +262,7 @@ ImotionApp::on_fullscreen_start ()
     m_window_fullscreen->show ();
     m_window_fullscreen->fullscreen ();
     m_cameramanager.set_video (&m_draw_fullscreen);
+    m_break_button->set_active(false);
 }
 
 void
