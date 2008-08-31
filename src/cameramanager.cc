@@ -19,10 +19,11 @@
 
 #include "cameramanager.h"
 
+
 static
 GstBusSyncReply
 //create_window (GstBus * bus, GstMessage * message, GstPipeline * pipeline)
-create_window (GstBus * bus, GstMessage * message, Gtk::DrawingArea *data)
+create_window (GstBus *bus, GstMessage *message, Gtk::DrawingArea *data)
 {
     // GstXOverlay *sink = GST_X_OVERLAY(user_data);
 
@@ -94,6 +95,12 @@ void
 CameraManager::set_video (Gtk::DrawingArea **a_video)
 {
     m_video = a_video;
+
+    if (m_sink)
+    {
+        XID video = gdk_x11_drawable_get_xid( (*m_video)->get_window()->gobj());
+        gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(m_sink), video);
+    }
 }
 
 
@@ -112,14 +119,7 @@ CameraManager::play_cam ()
 
 
     m_filter = gst_element_factory_make ("ffmpegcolorspace", "filter");
-
     m_videoscale = gst_element_factory_make ("videoscale", "video_scale");
-
-
-//    m_effect = gst_element_factory_make ("edgetv", "effect");
-
-
-
     m_sink = gst_element_factory_make ("ximagesink", "video_sink");
 
     //   sink = gst_element_factory_make ("sdlvideosink", "video_sink");
@@ -128,29 +128,17 @@ CameraManager::play_cam ()
         //    return EXIT_FAILURE;
     }
 
-    if (m_effect) {
-        /* set up pipeline */
-        gst_bin_add_many (GST_BIN (m_bin), m_source, m_filter, m_videoscale, m_effect, m_sink, NULL);
-        gst_bin_add (GST_BIN (m_pipeline), m_bin);
-        //    gst_element_link_many (source, filter, videoscale, effect, sink, NULL);
-        gst_element_link_pads (m_source, "src", m_filter, "sink");
-        gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
-        gst_element_link_pads (m_videoscale, "src", m_effect, "sink");
-        gst_element_link_pads (m_effect, "src", m_sink, "sink");
+    /* set up pipeline */
+    gst_bin_add_many (GST_BIN (m_bin), m_source, m_filter, m_videoscale, m_sink, NULL);
+    gst_bin_add (GST_BIN (m_pipeline), m_bin);
 
+    gst_element_link_many (m_source, m_filter, m_videoscale, m_sink, NULL);
 
-    }
-    else {
-        /* set up pipeline */
-        gst_bin_add_many (GST_BIN (m_bin), m_source, m_filter, m_videoscale, m_sink, NULL);
-        gst_bin_add (GST_BIN (m_pipeline), m_bin);
-        //    gst_element_link_many (source, filter, videoscale, sink, NULL);
-
-        gst_element_link_pads (m_source, "src", m_filter, "sink");
-        gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
-        gst_element_link_pads (m_videoscale, "src", m_sink, "sink");
-
-    }
+/*
+    gst_element_link_pads (m_source, "src", m_filter, "sink");
+    gst_element_link_pads (m_filter, "src", m_videoscale, "sink");
+    gst_element_link_pads (m_videoscale, "src", m_sink, "sink");
+*/
 
 
     gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
@@ -178,20 +166,6 @@ CameraManager::stop_cam ()
         std::cout << "Stop cam" << std::endl;
     }
 }
-/*
-void
-CameraManager::stop_flow ()
-{
-    if ( m_pipeline )
-    {
-
-        gboolean  gst_pad_set_blocked (GstPad *pad,
-                                       gboolean blocked);
-
-        std::cout << "Flow stopped" << std::endl;
-    }
-}
-*/
 
 
 void
@@ -261,12 +235,10 @@ CameraManager::switch_effect (Glib::ustring a_name)
                                  "src",
                                  m_effect,
                                  "sink");
-
         gst_element_link_pads (m_videoscale,
                                "src",
                                m_sink,
                                "sink");
-
 
         m_effect = 0;
         std::cout << "no effect" << std::endl;
@@ -276,23 +248,9 @@ CameraManager::switch_effect (Glib::ustring a_name)
 
     gst_pad_set_blocked (pad, FALSE);
     std::cout << "unblocked source pad" << std::endl;
-
     std::cout << m_effect_name << std::endl;
 }
 
-
-
-void
-CameraManager::restart ()
-{
-//    switch_effect (m_effect_name);
-//    XID video = gdk_x11_drawable_get_xid (m_video->get_window()->gobj() );
-
-//    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (GST_MESSAGE_SRC (message)), video);
-//    gst_bus_set_sync_handler (NULL, NULL, NULL);
-//    gst_bus_set_sync_handler (m_bus, (GstBusSyncHandler) create_window, *m_video);
-
-}
 
 
 CameraManager::~CameraManager ()

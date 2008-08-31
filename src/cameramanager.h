@@ -38,7 +38,6 @@ public:
     void switch_effect (Glib::ustring a_name);
     void pause_cam ();
     void replay_cam ();
-    void restart ();
 
 protected:
     void stop_cam ();
