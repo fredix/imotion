@@ -98,6 +98,9 @@ CameraManager::set_video (Gtk::DrawingArea **a_video)
 
     if (m_sink)
     {
+        // replay pipeline if it paused
+        gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
+
         XID video = gdk_x11_drawable_get_xid( (*m_video)->get_window()->gobj());
         gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(m_sink), video);
     }
@@ -194,9 +197,13 @@ CameraManager::switch_effect (Glib::ustring a_name)
 {
     m_effect_name = a_name;
 
+    // replay pipeline if it paused
+    gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
+
     GstPad *pad = gst_element_get_static_pad (m_source, "src");
     gst_pad_set_blocked (pad, TRUE);
     std::cout << "blocked source pad" << std::endl;
+
 
     if (m_effect)
     {

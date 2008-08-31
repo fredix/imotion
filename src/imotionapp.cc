@@ -260,8 +260,8 @@ void
 ImotionApp::on_fullscreen_start ()
 {
     m_window_fullscreen->show ();
-    m_cameramanager.set_video (&m_draw_fullscreen);
     m_window_fullscreen->fullscreen ();
+    m_cameramanager.set_video (&m_draw_fullscreen);
 }
 
 void
