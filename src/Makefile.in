@@ -246,7 +246,7 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-geekast$(EXEEXT): $(geekast_OBJECTS) $(geekast_DEPENDENCIES) 
+geekast$(EXEEXT): $(geekast_OBJECTS) $(geekast_DEPENDENCIES)
 	@rm -f geekast$(EXEEXT)
 	$(LINK) $(geekast_OBJECTS) $(geekast_LDADD) $(LIBS)
 

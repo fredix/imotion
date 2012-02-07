@@ -16,6 +16,6 @@ class Clock : public Gtk::DrawingArea
     double m_lineWidth;
     bool onSecondElapsed(void);
 };
-        
+
 #endif // GTKMM_EXAMPLE_CLOCK_H
-       
+
